@@ -21,9 +21,12 @@ def compute_similarity_matrix(sentences, sentence_vectors):
 
 def compute_ranked_sentences(sentences, similiraity_mat):
     nx_graph = nx.from_numpy_array(similiraity_mat)
-    scores = nx.pagerank(nx_graph)
-    ranked_sentences = sorted(((scores[i], s) for i, s in enumerate(sentences)), reverse=True)
-    return ranked_sentences
+    try:
+        scores = nx.pagerank(nx_graph)
+        ranked_sentences = sorted(((scores[i], s) for i, s in enumerate(sentences)), reverse=True)
+        return ranked_sentences
+    except:
+        return []
 
 
 def get_summary(original_sentences, sentence_vectors, n=5):
@@ -32,5 +35,6 @@ def get_summary(original_sentences, sentence_vectors, n=5):
 
     summary = []
     for i in range(n):
-        summary.append(ranked_sentences[i][1])
+        if ranked_sentences:
+            summary.append(ranked_sentences[i][1])
     return summary

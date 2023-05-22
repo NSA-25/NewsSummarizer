@@ -5,12 +5,15 @@ import string
 from nltk.stem import WordNetLemmatizer
 import text_rank
 import k_means
+import tf_idf
 import nltk
 from gensim.models import Word2Vec
 import csv
 from rouge import Rouge
 nltk.download('punkt')
 nltk.download('stopwords')
+# CNN dataset https://www.kaggle.com/datasets/gowrishankarp/newspaper-text-summarization-cnn-dailymail
+# glove.6B.100d.txt: https://downloads.cs.stanford.edu/nlp/data/glove.6B.zip
 
 
 def get_sentences(file_name, nr):
@@ -88,27 +91,38 @@ def rouge(predicted_summary, original_summary):
     scores = rouge.get_scores(predicted_summary, original_summary)
     print(scores)
 
+    return scores
+
 
 if __name__ == "__main__":
     text_path = 'cnn_dailymail.csv'
-    file_number = 2
+    file_number = 5
     texts = get_sentences(text_path, file_number + 1)
     for article in texts:
         original_sentences = article[0]
         original_summary = article[1]
         clean_sentences = get_clean_sentences(original_sentences)
-        sentence_vectors = glove(clean_sentences)
+        sentence_vectors = word_2_vec(clean_sentences)
 
         n = len(original_summary) + 1
-        text_rank_summary = text_rank.get_summary(original_sentences, sentence_vectors, n=n)
+        tf_idf_summary = tf_idf.get_summary(original_sentences, n)
         k_means_summary = k_means.get_summary(original_sentences, sentence_vectors, n=n)
+        text_rank_summary = text_rank.get_summary(original_sentences, sentence_vectors, n=n)
+
+        # for sentence in tf_idf_summary:
+        #     print(sentence)
+        print('TF-IDF Score: ', end='')
+        rouge(" ".join(tf_idf_summary), " ".join(original_summary))
 
         # for sentence in k_means_summary:
         #     print(sentence)
         print('K-means Score: ', end='')
         rouge(" ".join(k_means_summary), " ".join(original_summary))
+
         # for sentence in text_rank_summary:
-        #     print(sentence)
+            # print(sentence)
         print('TextRank Score: ', end='')
-        rouge(" ".join(text_rank_summary), " ".join(original_summary))
+        if text_rank_summary:
+            rouge(" ".join(text_rank_summary), " ".join(original_summary))
+
         print('-------------------')
