@@ -5,7 +5,6 @@ nltk.download('wordnet')
 nltk.download('averaged_perceptron_tagger')
 import re
 import math
-from collections import Counter
 from nltk.stem import WordNetLemmatizer
 from nltk.corpus import stopwords
 from nltk.tokenize import sent_tokenize
@@ -27,7 +26,6 @@ def preprocess(words, remove_special=False, remove_stopwords=False, lemmatize=Fa
             processed_words.append(wordlemmatizer.lemmatize(w))
     return processed_words
 
-
 def noun_and_verbs(text):
     pos_tagged = nltk.pos_tag(text)
     nouns_verbs = []
@@ -36,22 +34,14 @@ def noun_and_verbs(text):
             nouns_verbs.append(word)
     return nouns_verbs
 
-
-def words_frequency(words):
-    words = [w.lower() for w in words]
-    freq = Counter(words)
-    return dict(freq)
-
-
 def tf(word, sentence):
     word_frequency = 0
     len_sentence = len(sentence)
     for word_sentence in sentence:
         if word == word_sentence:
-            word_frequency += word_frequency + 1
+            word_frequency +=  1
     tf = word_frequency / len_sentence
     return tf
-
 
 def idf(word, sentences):
     n_sentences = len(sentences)
@@ -87,7 +77,6 @@ def sentence_score(s, sentences):
 
 def summarize_text_TFIDF(text, text_retain_percent):
     tokenized_sentences = sent_tokenize(text)
-
     n_retained_sentences = int((text_retain_percent * len(tokenized_sentences)) / 100)
     sentences_scores = {}
     i = 0
